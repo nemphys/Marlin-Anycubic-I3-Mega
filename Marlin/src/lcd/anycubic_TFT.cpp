@@ -33,6 +33,7 @@
 #include "../module/stepper.h"
 #include "../core/serial.h"
 #include "../module/printcounter.h"
+#include "../module/probe.h"
 
 #ifdef ANYCUBIC_TFT_MODEL
 #include "anycubic_TFT.h"
