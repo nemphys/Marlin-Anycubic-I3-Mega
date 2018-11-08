@@ -36,6 +36,8 @@
 #define SDPOWER            -1
 #define SDSS               53
 #define LED_PIN            13
+#define EXTRUDER_LED_PIN    5
+#define STAT_LED_RED_PIN    EXTRUDER_LED_PIN
 #define Z_MIN_PROBE_PIN     2
 #define FIL_RUNOUT_PIN	   19
 
