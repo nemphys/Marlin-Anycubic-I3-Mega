@@ -55,6 +55,10 @@
   #include "../feature/leds/printer_event_leds.h"
 #endif
 
+#if ENABLED(ANYCUBIC_TFT_MODEL)
+  #include "../lcd/anycubic_TFT.h"
+#endif
+
 #if HOTEND_USES_THERMISTOR
   #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
     static void* heater_ttbl_map[2] = { (void*)HEATER_0_TEMPTABLE, (void*)HEATER_1_TEMPTABLE };
@@ -2499,6 +2503,10 @@ void Temperature::isr() {
           if (!wants_to_cool) printerEventLEDs.onHotendHeating(start_temp, temp, target_temp);
         #endif
 
+        #ifdef ANYCUBIC_TFT_MODEL
+          AnycubicTFT.CommandScan();
+        #endif
+
         #if TEMP_RESIDENCY_TIME > 0
 
           const float temp_diff = ABS(target_temp - temp);
@@ -2533,6 +2541,10 @@ void Temperature::isr() {
           printerEventLEDs.onHeatingDone();
         #endif
       }
+
+      #ifdef ANYCUBIC_TFT_MODEL
+        AnycubicTFT.HeatingDone();
+      #endif
 
       #if DISABLED(BUSY_WHILE_HEATING) && ENABLED(HOST_KEEPALIVE_FEATURE)
         gcode.busy_state = old_busy_state;
@@ -2613,6 +2625,10 @@ void Temperature::isr() {
           if (!wants_to_cool) printerEventLEDs.onBedHeating(start_temp, temp, target_temp);
         #endif
 
+        #ifdef ANYCUBIC_TFT_MODEL
+          AnycubicTFT.CommandScan();
+        #endif
+
         #if TEMP_BED_RESIDENCY_TIME > 0
 
           const float temp_diff = ABS(target_temp - temp);
@@ -2640,6 +2656,10 @@ void Temperature::isr() {
         }
 
       } while (wait_for_heatup && TEMP_BED_CONDITIONS);
+
+      #ifdef ANYCUBIC_TFT_MODEL
+        AnycubicTFT.BedHeatingDone();
+      #endif
 
       if (wait_for_heatup) lcd_reset_status();
 

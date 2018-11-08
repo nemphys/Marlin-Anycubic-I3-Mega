@@ -27,6 +27,10 @@
 #include "../../lcd/ultralcd.h"
 #include "../../Marlin.h"
 
+#if ENABLED(ANYCUBIC_TFT_MODEL)
+  #include "../../lcd/anycubic_TFT.h"
+#endif
+
 #if ENABLED(PRINTJOB_TIMER_AUTOSTART)
   #include "../../module/printcounter.h"
 #endif
@@ -119,6 +123,10 @@ void GcodeSuite::M109() {
         thermalManager.set_heating_message(target_extruder);
     #endif
   }
+
+  #ifdef ANYCUBIC_TFT_MODEL
+    AnycubicTFT.HeatingStart();
+  #endif
 
   #if ENABLED(AUTOTEMP)
     planner.autotemp_M104_M109();

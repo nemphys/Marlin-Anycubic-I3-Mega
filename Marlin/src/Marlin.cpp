@@ -154,6 +154,10 @@
   #include "feature/controllerfan.h"
 #endif
 
+#if ENABLED(ANYCUBIC_TFT_MODEL)
+  #include "lcd/anycubic_TFT.h"
+#endif
+
 #if ENABLED(EXTENSIBLE_UI)
   #include "lcd/extensible_ui/ui_api.h"
 #endif
@@ -333,6 +337,10 @@ void manage_inactivity(const bool ignore_stepper_queue/*=false*/) {
 
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     runout.run();
+  #endif
+
+  #if ENABLED(ANYCUBIC_TFT_MODEL) && ENABLED(ANYCUBIC_FILAMENT_RUNOUT_SENSOR)
+    AnycubicTFT.FilamentRunout();
   #endif
 
   if (commands_in_queue < BUFSIZE) get_available_commands();
@@ -549,6 +557,10 @@ void idle(
     max7219.idle_tasks();
   #endif
 
+  #ifdef ANYCUBIC_TFT_MODEL
+    AnycubicTFT.CommandScan();
+  #endif
+
   lcd_update();
 
   #if ENABLED(HOST_KEEPALIVE_FEATURE)
@@ -613,6 +625,10 @@ void kill(PGM_P const lcd_msg/*=NULL*/) {
     kill_screen(lcd_msg ? lcd_msg : PSTR(MSG_KILLED));
   #else
     UNUSED(lcd_msg);
+  #endif
+
+  #ifdef ANYCUBIC_TFT_MODEL
+    AnycubicTFT.KillTFT();
   #endif
 
   #ifdef ACTION_ON_KILL
@@ -747,6 +763,10 @@ void setup() {
 
   SERIAL_PROTOCOLLNPGM("start");
   SERIAL_ECHO_START();
+
+  #ifdef ANYCUBIC_TFT_MODEL
+    AnycubicTFT.Setup();
+  #endif
 
   #if TMC_HAS_SPI
     #if DISABLED(TMC_USE_SW_SPI)
@@ -989,5 +1009,9 @@ void loop() {
     advance_command_queue();
     endstops.event_handler();
     idle();
+
+    #ifdef ANYCUBIC_TFT_MODEL
+      AnycubicTFT.CommandScan();
+    #endif
   }
 }

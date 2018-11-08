@@ -37,6 +37,10 @@
   #include "../../feature/leds/leds.h"
 #endif
 
+#if ENABLED(ANYCUBIC_TFT_MODEL)
+  #include "../../lcd/anycubic_TFT.h"
+#endif
+
 #include "../../Marlin.h" // for wait_for_heatup and idle()
 
 /**
@@ -63,6 +67,10 @@ void GcodeSuite::M190() {
     #endif
   }
   else return;
+
+  #ifdef ANYCUBIC_TFT_MODEL
+    AnycubicTFT.BedHeatingStart();
+  #endif
 
   lcd_setstatusPGM(thermalManager.isHeatingBed() ? PSTR(MSG_BED_HEATING) : PSTR(MSG_BED_COOLING));
 
