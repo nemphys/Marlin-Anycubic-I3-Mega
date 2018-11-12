@@ -87,7 +87,7 @@
     #endif
 
     #if HAS_LCD_MENU
-      lcd_reset_status();
+      ui.reset_status();
     #endif
 
     #ifdef ANYCUBIC_TFT_MODEL
