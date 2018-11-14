@@ -24,9 +24,7 @@
  * Arduino Mega with RAMPS v1.4 for Anycubic
  */
 
-#ifndef BOARD_NAME
-  #define BOARD_NAME "Anycubic RAMPS 1.4"
-#endif
+#define BOARD_NAME "Anycubic RAMPS 1.4"
 
 #define BOARD_NAME         "TRIGORILLA"
 #define LARGE_FLASH        true
