@@ -399,9 +399,9 @@
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 
   // Anycubic I3 Mega
-  #define DEFAULT_Kp 13.3
-  #define DEFAULT_Ki 0.60
-  #define DEFAULT_Kd 73.26
+  #define DEFAULT_Kp 14.39
+  #define DEFAULT_Ki 0.67
+  #define DEFAULT_Kd 77.24
 
   // Ultimaker
   //#define DEFAULT_Kp 22.2
