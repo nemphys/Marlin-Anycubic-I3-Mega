@@ -235,7 +235,7 @@ void AnycubicTFTClass::Ls()
         break;
     }
   }
-  else if(card.cardOK)
+  else if(card.flag.cardOK)
   {
     uint16_t cnt=filenumber;
     uint16_t max_files;
@@ -267,7 +267,7 @@ void AnycubicTFTClass::Ls()
         card.getfilename(cnt-1);
 //      card.getfilename(cnt);
 
-        if(card.filenameIsDir) {
+        if(card.flag.filenameIsDir) {
           ANYCUBIC_SERIAL_PROTOCOLPGM("/");
           ANYCUBIC_SERIAL_PROTOCOLLN(card.filename);
           ANYCUBIC_SERIAL_PROTOCOLPGM("/");
@@ -345,7 +345,7 @@ void AnycubicTFTClass::StateHandler()
 {
   switch (TFTstate) {
   case ANYCUBIC_TFT_STATE_IDLE:
-    if(card.sdprinting){
+    if(card.flag.sdprinting){
       TFTstate=ANYCUBIC_TFT_STATE_SDPRINT;
       starttime=millis();
 
@@ -353,7 +353,7 @@ void AnycubicTFTClass::StateHandler()
     }
     break;
   case ANYCUBIC_TFT_STATE_SDPRINT:
-      if(!card.sdprinting){
+      if(!card.flag.sdprinting){
         // It seems that we are to printing anymore... pause or stopped?
         if (card.isFileOpen()){
           // File is still open --> paused
@@ -380,7 +380,7 @@ void AnycubicTFTClass::StateHandler()
 #endif
     break;
   case ANYCUBIC_TFT_STATE_SDPAUSE_REQ:
-    if((!card.sdprinting) && (!planner.movesplanned())){
+    if((!card.flag.sdprinting) && (!planner.movesplanned())){
       // We have to wait until the sd card printing has been settled
 #ifndef ADVANCED_PAUSE_FEATURE
       enqueue_and_echo_commands_P(PSTR("G91\nG1 Z10 F240\nG90"));
@@ -402,7 +402,7 @@ void AnycubicTFTClass::StateHandler()
     }
     break;
   case ANYCUBIC_TFT_STATE_SDSTOP_REQ:
-    if((!card.sdprinting) && (!planner.movesplanned())){
+    if((!card.flag.sdprinting) && (!planner.movesplanned())){
       ANYCUBIC_SERIAL_PROTOCOLPGM("J16");// J16 stop print
       ANYCUBIC_SERIAL_ENTER();
       TFTstate=ANYCUBIC_TFT_STATE_IDLE;
@@ -428,11 +428,11 @@ void AnycubicTFTClass::FilamentRunout()
     if(FilamentRunoutCounter>=15800)
     {
       FilamentRunoutCounter=0;
-      if((card.sdprinting==true))
+      if((card.flag.sdprinting==true))
       {
         PausePrint();
       }
-      else if((card.sdprinting==false))
+      else if((card.flag.sdprinting==false))
       {
         ANYCUBIC_SERIAL_PROTOCOLPGM("J15"); //J15 FILAMENT LACK
         ANYCUBIC_SERIAL_ENTER();
@@ -534,9 +534,9 @@ void AnycubicTFTClass::GetCommandFromTFT()
             ANYCUBIC_SERIAL_ENTER();
             break;
           case 6: //A6 GET SD CARD PRINTING STATUS
-            if(card.sdprinting){
+            if(card.flag.sdprinting){
               ANYCUBIC_SERIAL_PROTOCOLPGM("A6V ");
-              if(card.cardOK)
+              if(card.flag.cardOK)
               {
                 ANYCUBIC_SERIAL_PROTOCOL(itostr3(card.percentDone()));
               }
@@ -590,7 +590,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
             }
             break;
           case 9: // A9 pause sd print
-            if(card.sdprinting)
+            if(card.flag.sdprinting)
             {
               PausePrint();
             }
@@ -611,7 +611,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
             }
             break;
           case 11: // A11 STOP SD PRINT
-            if((card.sdprinting) || (TFTstate==ANYCUBIC_TFT_STATE_SDOUTAGE))
+            if((card.flag.sdprinting) || (TFTstate==ANYCUBIC_TFT_STATE_SDOUTAGE))
             {
               StopPrint();
             }
@@ -664,7 +664,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
           case 15: // A15 RESUMING FROM OUTAGE
             //                    			if((!planner.movesplanned())&&(!TFTresumingflag))
             //                          {
-            //                                if(card.cardOK)
+            //                                if(card.flag.cardOK)
             //                                FlagResumFromOutage=true;
             //                                ResumingFlag=1;
             //                                card.startFileprint();
@@ -712,7 +712,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
             ANYCUBIC_SERIAL_ENTER();
             break;
           case 19: // A19 stop stepper drivers
-            if((!planner.movesplanned())&&(!card.sdprinting))
+            if((!planner.movesplanned())&&(!card.flag.sdprinting))
             {
               quickstop_stepper();
               disable_X();
