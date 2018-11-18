@@ -23,6 +23,12 @@
 
 #include "../inc/MarlinConfig.h"
 
+#if HAS_BUZZER
+  #include "../libs/buzzer.h"
+#endif
+
+#define HAS_ENCODER_ACTION (HAS_LCD_MENU || ENABLED(ULTIPANEL_FEEDMULTIPLY))
+
 #if HAS_SPI_LCD
 
   #include "../Marlin.h"
@@ -31,16 +37,6 @@
     #include "../feature/pause.h"
     #include "../module/motion.h" // for active_extruder
   #endif
-
-#endif
-
-#if HAS_BUZZER
-  #include "../libs/buzzer.h"
-#endif
-
-#define HAS_ENCODER_ACTION (HAS_LCD_MENU || ENABLED(ULTIPANEL_FEEDMULTIPLY))
-
-#if HAS_SPI_LCD
 
   enum LCDViewAction : uint8_t {
     LCDVIEW_NONE,
@@ -66,6 +62,10 @@
 
   #if HAS_LCD_MENU
 
+    #if ENABLED(SDSUPPORT)
+      #include "../sd/cardreader.h"
+    #endif
+
     typedef void (*screenFunc_t)();
     typedef void (*menuAction_t)();
 
@@ -88,7 +88,7 @@
 
 #endif
 
-#if HAS_DIGITAL_ENCODER
+#if HAS_DIGITAL_BUTTONS
 
   // Wheel spin pins where BA is 00, 10, 11, 01 (1 bit always changes)
   #define BLEN_A 0
@@ -213,9 +213,6 @@
   };
 #endif
 
-#define LCD_MESSAGEPGM(x)      ui.setstatusPGM(PSTR(x))
-#define LCD_ALERTMESSAGEPGM(x) ui.setalertstatusPGM(PSTR(x))
-
 ////////////////////////////////////////////
 //////////// MarlinUI Singleton ////////////
 ////////////////////////////////////////////
@@ -246,14 +243,21 @@ public:
   #if HAS_SPI_LCD || ENABLED(MALYAN_LCD) || ENABLED(EXTENSIBLE_UI)
     static void init();
     static void update();
-    static void setalertstatusPGM(PGM_P message);
+    static void set_alert_status_P(PGM_P message);
   #else // NO LCD
     static inline void init() {}
     static inline void update() {}
-    static inline void setalertstatusPGM(PGM_P message) { UNUSED(message); }
+    static inline void set_alert_status_P(PGM_P message) { UNUSED(message); }
   #endif
 
   #if HAS_SPI_LCD || ENABLED(EXTENSIBLE_UI)
+
+    static char status_message[];
+    static bool has_status();
+
+
+    static uint8_t status_message_level;      // Higher levels block lower levels
+    static inline void reset_alert_level() { status_message_level = 0; }
 
     #if HAS_SPI_LCD
 
@@ -299,16 +303,10 @@ public:
 
       #endif
 
-      // Status message
-      static char status_message[];
       #if ENABLED(STATUS_MESSAGE_SCROLLING)
         static uint8_t status_scroll_offset;
       #endif
-      static bool has_status();
-
       static uint8_t lcd_status_update_delay;
-      static uint8_t status_message_level;      // Higher levels block lower levels
-      static inline void reset_alert_level() { status_message_level = 0; }
 
       #if HAS_PRINT_PROGRESS
         #if ENABLED(LCD_SET_PROGRESS_MANUALLY)
@@ -344,26 +342,22 @@ public:
       static void status_screen();
 
     #else
-
       static void refresh() {}
-      static inline void reset_alert_level() {}
-      static constexpr bool has_status() { return true; }
-
     #endif
 
     static bool get_blink();
     static void kill_screen(PGM_P const lcd_msg);
     static void draw_kill_screen();
-    static void setstatus(const char* const message, const bool persist=false);
-    static void setstatusPGM(PGM_P const message, const int8_t level=0);
+    static void set_status(const char* const message, const bool persist=false);
+    static void set_status_P(PGM_P const message, const int8_t level=0);
     static void status_printf_P(const uint8_t level, PGM_P const fmt, ...);
     static void reset_status();
 
   #else // MALYAN_LCD or NO LCD
 
     static inline void refresh() {}
-    static inline void setstatus(const char* const message, const bool persist=false) { UNUSED(message); UNUSED(persist); }
-    static inline void setstatusPGM(PGM_P const message, const int8_t level=0) { UNUSED(message); UNUSED(level); }
+    static inline void set_status(const char* const message, const bool persist=false) { UNUSED(message); UNUSED(persist); }
+    static inline void set_status_P(PGM_P const message, const int8_t level=0) { UNUSED(message); UNUSED(level); }
     static inline void status_printf_P(const uint8_t level, PGM_P const fmt, ...) { UNUSED(level); UNUSED(fmt); }
     static inline void reset_status() {}
     static inline void reset_alert_level() {}
@@ -379,8 +373,11 @@ public:
       static void enable_encoder_multiplier(const bool onoff);
     #endif
 
-    #if ENABLED(SCROLL_LONG_FILENAMES)
-      static uint8_t filename_scroll_pos, filename_scroll_max;
+    #if ENABLED(SDSUPPORT)
+      #if ENABLED(SCROLL_LONG_FILENAMES)
+        static uint8_t filename_scroll_pos, filename_scroll_max;
+      #endif
+      static const char * const scrolled_filename(CardReader &theCard, const uint8_t maxlen, uint8_t hash, const bool doScroll);
     #endif
 
     #if IS_KINEMATIC
@@ -508,6 +505,10 @@ private:
 
   static void _synchronize();
 
+  #if HAS_SPI_LCD || ENABLED(EXTENSIBLE_UI)
+    static void finishstatus(const bool persist);
+  #endif
+
   #if HAS_SPI_LCD
     #if HAS_LCD_MENU
       #if LCD_TIMEOUT_TO_STATUS
@@ -517,10 +518,10 @@ private:
       #endif
     #endif
     static void draw_status_screen();
-    static void finishstatus(const bool persist);
-  #else
-    static inline void finishstatus(const bool persist) { UNUSED(persist); refresh(); }
   #endif
 };
 
 extern MarlinUI ui;
+
+#define LCD_MESSAGEPGM(x)      ui.set_status_P(PSTR(x))
+#define LCD_ALERTMESSAGEPGM(x) ui.set_alert_status_P(PSTR(x))
