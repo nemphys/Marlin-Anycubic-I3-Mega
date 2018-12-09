@@ -195,16 +195,16 @@ void AnycubicTFTClass::HandleSpecialMenu()
   if(strcmp(SelectedDirectory, "<special menu>")==0) {
     SpecialMenu=true;
   } else if (strcmp(SelectedDirectory, "<auto tune hotend pid>")==0) {
-    SERIAL_PROTOCOLLNPGM("Special Menu: Auto Tune PID");
+    SERIAL_ECHOLNPGM("Special Menu: Auto Tune PID");
     enqueue_and_echo_commands_P(PSTR("M303 C8 S200"));
   } else if (strcmp(SelectedDirectory, "<auto bed leveling>")==0) {
-    SERIAL_PROTOCOLLNPGM("Special Menu: Auto Bed Leveling");
+    SERIAL_ECHOLNPGM("Special Menu: Auto Bed Leveling");
     enqueue_and_echo_commands_P(PSTR("G28\nG29"));
   } else if (strcmp(SelectedDirectory, "<save eeprom>")==0) {
-    SERIAL_PROTOCOLLNPGM("Special Menu: Save EEPROM");
+    SERIAL_ECHOLNPGM("Special Menu: Save EEPROM");
     enqueue_and_echo_commands_P(PSTR("M500"));
   } else if (strcmp(SelectedDirectory, "<read eeprom>")==0) {
-    SERIAL_PROTOCOLLNPGM("Special Menu: Read EEPROM");
+    SERIAL_ECHOLNPGM("Special Menu: Read EEPROM");
     enqueue_and_echo_commands_P(PSTR("M501"));
   } else if (strcmp(SelectedDirectory, "<exit>")==0) {
     SpecialMenu=false;
@@ -255,13 +255,13 @@ void AnycubicTFTClass::Ls()
         if(strcmp(card.getWorkDirName(), "/") == 0) {
           ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Special Menu>");
           ANYCUBIC_SERIAL_PROTOCOLLNPGM("<Special Menu>");
-          SERIAL_PROTOCOL(cnt);
-          SERIAL_PROTOCOLLNPGM("<Special_Menu>");
+          SERIAL_ECHO(cnt);
+          SERIAL_ECHOLNPGM("<Special_Menu>");
         } else {
           ANYCUBIC_SERIAL_PROTOCOLLNPGM("/..");
           ANYCUBIC_SERIAL_PROTOCOLLNPGM("/..");
-          SERIAL_PROTOCOL(cnt);
-          SERIAL_PROTOCOLLNPGM("/..");
+          SERIAL_ECHO(cnt);
+          SERIAL_ECHOLNPGM("/..");
         }
       } else {
         card.getfilename(cnt-1);
@@ -272,14 +272,14 @@ void AnycubicTFTClass::Ls()
           ANYCUBIC_SERIAL_PROTOCOLLN(card.filename);
           ANYCUBIC_SERIAL_PROTOCOLPGM("/");
           ANYCUBIC_SERIAL_PROTOCOLLN(card.longFilename);
-          SERIAL_PROTOCOL(cnt);
-          SERIAL_PROTOCOLPGM("/");
-          SERIAL_PROTOCOLLN(card.longFilename);
+          SERIAL_ECHO(cnt);
+          SERIAL_ECHOPGM("/");
+          SERIAL_ECHOLN(card.longFilename);
         } else {
           ANYCUBIC_SERIAL_PROTOCOLLN(card.filename);
           ANYCUBIC_SERIAL_PROTOCOLLN(card.longFilename);
-          SERIAL_PROTOCOL(cnt);
-          SERIAL_PROTOCOLLN(card.longFilename);
+          SERIAL_ECHO(cnt);
+          SERIAL_ECHOLN(card.longFilename);
         }
       }
     }
