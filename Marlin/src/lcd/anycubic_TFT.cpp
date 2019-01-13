@@ -173,7 +173,7 @@ void AnycubicTFTClass::StopPrint(){
   print_job_timer.stop();
   thermalManager.disable_all_heaters();
   #if FAN_COUNT > 0
-    for (uint8_t i = 0; i < FAN_COUNT; i++) fan_speed[i] = 0;
+    for (uint8_t i = 0; i < FAN_COUNT; i++) thermalManager.fan_speed[i] = 0;
   #endif
   TFTstate=ANYCUBIC_TFT_STATE_SDSTOP_REQ;
 }
@@ -235,7 +235,7 @@ void AnycubicTFTClass::Ls()
         break;
     }
   }
-  else if(card.flag.cardOK)
+  else if(card.isDetected())
   {
     uint16_t cnt=filenumber;
     uint16_t max_files;
@@ -511,7 +511,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
           {
             unsigned int temp;
 
-            temp=((fan_speed[0]*100)/255);
+            temp=((thermalManager.fan_speed[0]*100)/255);
             temp=constrain(temp,0,100);
 
             ANYCUBIC_SERIAL_PROTOCOLPGM("A4V ");
@@ -536,7 +536,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
           case 6: //A6 GET SD CARD PRINTING STATUS
             if(card.flag.sdprinting){
               ANYCUBIC_SERIAL_PROTOCOLPGM("A6V ");
-              if(card.flag.cardOK)
+              if(card.isDetected())
               {
                 ANYCUBIC_SERIAL_PROTOCOL(itostr3(card.percentDone()));
               }
@@ -664,7 +664,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
           case 15: // A15 RESUMING FROM OUTAGE
             //                    			if((!planner.movesplanned())&&(!TFTresumingflag))
             //                          {
-            //                                if(card.flag.cardOK)
+            //                                if(card.isDetected())
             //                                FlagResumFromOutage=true;
             //                                ResumingFlag=1;
             //                                card.startFileprint();
@@ -706,9 +706,9 @@ void AnycubicTFTClass::GetCommandFromTFT()
             {
               temp=(CodeValue()*255/100);
               temp=constrain(temp,0,255);
-              fan_speed[0]=temp;
+              thermalManager.fan_speed[0]=temp;
             }
-            else fan_speed[0]=255;
+            else thermalManager.fan_speed[0]=255;
             ANYCUBIC_SERIAL_ENTER();
             break;
           case 19: // A19 stop stepper drivers
