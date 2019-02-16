@@ -37,12 +37,9 @@ void handle_status_leds(void) {
   if (ELAPSED(millis(), next_status_led_update_ms)) {
     next_status_led_update_ms += 500; // Update every 0.5s
     float max_temp = 0.0;
-    #if HAS_HEATED_BED
-      max_temp = MAX(thermalManager.degTargetBed(), thermalManager.degBed());
-    #endif
     HOTEND_LOOP()
-      max_temp = MAX(max_temp, thermalManager.degHotend(e), thermalManager.degTargetHotend(e));
-    const int8_t new_red = (max_temp > 55.0) ? HIGH : (max_temp < 54.0 || old_red < 0) ? LOW : old_red;
+      max_temp = thermalManager.degHotend(e);
+    const int8_t new_red = (max_temp >= EXTRUDER_AUTO_FAN_TEMPERATURE) ? HIGH : (max_temp <  EXTRUDER_AUTO_FAN_TEMPERATURE) ? LOW : old_red;
     if (new_red != old_red) {
       old_red = new_red;
       #if PIN_EXISTS(STAT_LED_RED)
