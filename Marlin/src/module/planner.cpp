@@ -92,6 +92,10 @@
   #include "../feature/power.h"
 #endif
 
+#if FAN_COUNT > 0 && ENABLED(FAN_IS_SERVO)
+  #include "servo.h"
+#endif
+
 // Delay for delivery of first block to the stepper ISR, if the queue contains 2 or
 // fewer movements. The delay is measured in milliseconds, and must be less than 250ms
 #define BLOCK_DELAY_FOR_1ST_MOVE 100
@@ -1246,7 +1250,9 @@ void Planner::check_axes_activity() {
         } else fan_kick_end[f] = 0
 
       #if HAS_FAN0
-        KICKSTART_FAN(0);
+        #if DISABLED(FAN_IS_SERVO)
+          KICKSTART_FAN(0);
+        #endif
       #endif
       #if HAS_FAN1
         KICKSTART_FAN(1);
@@ -1265,7 +1271,14 @@ void Planner::check_axes_activity() {
 
     #if ENABLED(FAN_SOFT_PWM)
       #if HAS_FAN0
-        thermalManager.soft_pwm_amount_fan[0] = CALC_FAN_SPEED(0);
+        #if ENABLED(FAN_IS_SERVO)
+          if (previous_fan_speed != tail_fan_speed[0]) {
+            previous_fan_speed = tail_fan_speed[0];
+            MOVE_SERVO(FAN_SERVO_NO, (tail_fan_speed[0] ? map(tail_fan_speed[0], 1, 255, FAN_SERVO_MIN, FAN_SERVO_MAX) : FAN_SERVO_MIN));
+          }
+        #else
+          thermalManager.soft_pwm_amount_fan[0] = CALC_FAN_SPEED(0);
+        #endif
       #endif
       #if HAS_FAN1
         thermalManager.soft_pwm_amount_fan[1] = CALC_FAN_SPEED(1);
@@ -1275,7 +1288,14 @@ void Planner::check_axes_activity() {
       #endif
     #else
       #if HAS_FAN0
-        analogWrite(FAN_PIN, CALC_FAN_SPEED(0));
+        #if ENABLED(FAN_IS_SERVO)
+          if (previous_fan_speed != tail_fan_speed[0]) {
+            previous_fan_speed = tail_fan_speed[0];
+            MOVE_SERVO(FAN_SERVO_NO, (tail_fan_speed[0] ? map(tail_fan_speed[0], 1, 255, FAN_SERVO_MIN, FAN_SERVO_MAX) : FAN_SERVO_MIN));
+          }
+        #else
+          analogWrite(FAN_PIN, CALC_FAN_SPEED(0));
+        #endif
       #endif
       #if HAS_FAN1
         analogWrite(FAN1_PIN, CALC_FAN_SPEED(1));

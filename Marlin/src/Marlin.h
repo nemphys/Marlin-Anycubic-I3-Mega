@@ -346,6 +346,12 @@ extern volatile bool wait_for_heatup;
 // Inactivity shutdown timer
 extern millis_t max_inactive_time, stepper_inactive_time;
 
+#if FAN_COUNT > 0
+  #if ENABLED(FAN_IS_SERVO)
+    extern uint8_t previous_fan_speed;
+  #endif
+#endif
+
 #if ENABLED(USE_CONTROLLER_FAN)
   extern uint8_t controllerfan_speed;
 #endif

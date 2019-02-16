@@ -80,6 +80,10 @@
 
 // Fans
 #define FAN_PIN             9
+#define FAN_IS_SERVO
+#define FAN_SERVO_NO        0
+#define FAN_SERVO_MIN    1000
+#define FAN_SERVO_MAX    1900
 #define FAN2_PIN           44
 #define ORIG_E0_AUTO_FAN_PIN 44
 #define CONTROLLER_FAN_PIN  7
