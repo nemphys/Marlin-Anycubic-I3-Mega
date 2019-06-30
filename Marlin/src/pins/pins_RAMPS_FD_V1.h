@@ -1,9 +1,9 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
- * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@
 //
 // LCD / Controller
 //
-#if ENABLED(ULTRA_LCD)
+#if HAS_SPI_LCD
   // ramps-fd lcd adaptor
 
   #define BEEPER_PIN       37
@@ -155,16 +155,15 @@
   #if ENABLED(FYSETC_MINI_12864)
     #define DOGLCD_CS      LCD_PINS_ENABLE
     #define DOGLCD_A0      LCD_PINS_RS
+    #define DOGLCD_SCK     76
+    #define DOGLCD_MOSI    75
 
-    //#define FORCE_SOFT_SPI    // Use this if default of hardware SPI causes problems
+    //#define FORCE_SOFT_SPI    // Use this if default of hardware SPI causes display problems
+                                //   results in LCD soft SPI mode 3, SD soft SPI mode 0
 
     #define LCD_RESET_PIN  23   // Must be high or open for LCD to operate normally.
-                                // Seems to work best if left open.
 
-    #define FYSETC_MINI_12864_REV_1_2
-    //#define FYSETC_MINI_12864_REV_2_0
-    //#define FYSETC_MINI_12864_REV_2_1
-    #if EITHER(FYSETC_MINI_12864_REV_1_2, FYSETC_MINI_12864_REV_2_0)
+    #if EITHER(FYSETC_MINI_12864_1_2, FYSETC_MINI_12864_2_0)
       #ifndef RGB_LED_R_PIN
         #define RGB_LED_R_PIN 25
       #endif
@@ -174,20 +173,8 @@
       #ifndef RGB_LED_B_PIN
         #define RGB_LED_B_PIN 29
       #endif
-    #elif defined(FYSETC_MINI_12864_REV_2_1)
-      #define NEOPIXEL_LED
-      #define NEOPIXEL_TYPE NEO_GRB    // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
-      #define NEOPIXEL_PIN    25       // LED driving pin on motherboard 4 => D4 (EXP2-5 on Printrboard) / 30 => PC7 (EXP3-13 on Rumba)
-      #define NEOPIXEL_PIXELS  3       // Number of LEDs in the strip
-      #define NEOPIXEL_IS_SEQUENTIAL   // Sequential display for temperature change - LED by LED. Disable to change all LEDs at once.
-      #define NEOPIXEL_BRIGHTNESS 127  // Initial brightness (0-255)
-      #define NEOPIXEL_STARTUP_TEST    // Cycle through colors at startup
-    #else
-      #error "Either FYSETC_MINI_12864_REV_1_2, FYSETC_MINI_12864_REV_2_0 or FYSETC_MINI_12864_REV_2_1 must be defined"
-    #endif
-
-    #if !defined(LED_USER_PRESET_STARTUP) && EITHER(FYSETC_MINI_12864_REV_2_0, FYSETC_MINI_12864_REV_2_1)
-      #error "LED_USER_PRESET_STARTUP must be enabled when using FYSETC_MINI_12864 REV 2.0 and later"
+    #elif ENABLED(FYSETC_MINI_12864_2_1)
+      #define NEOPIXEL_PIN    25
     #endif
 
   #elif ENABLED(NEWPANEL)
@@ -215,11 +202,11 @@
     #define DOGLCD_MISO    74   // MISO_PIN
   #endif
 
-#endif // ULTRA_LCD
+#endif // HAS_SPI_LCD
 
-#if HAS_DRIVER(TMC2208)
+#if HAS_DRIVER(TMC2208) || HAS_DRIVER(TMC2209)
   /**
-   * TMC2208 stepper drivers
+   * TMC2208/TMC2209 stepper drivers
    *
    * Hardware serial communication ports.
    * If undefined software serial is used according to the pins below
@@ -240,7 +227,7 @@
 //
 // M3/M4/M5 - Spindle/Laser Control
 //
-#if HOTENDS < 3 && ENABLED(SPINDLE_LASER_ENABLE) && !PIN_EXISTS(SPINDLE_LASER_ENA)
+#if HOTENDS < 3 && HAS_CUTTER && !PIN_EXISTS(SPINDLE_LASER_ENA)
   #define SPINDLE_LASER_ENA_PIN 45   // Use E2 ENA
   #define SPINDLE_LASER_PWM_PIN 12   // MUST BE HARDWARE PWM
   #define SPINDLE_DIR_PIN       47   // Use E2 DIR
