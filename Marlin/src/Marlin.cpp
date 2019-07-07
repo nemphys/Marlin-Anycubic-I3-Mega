@@ -153,7 +153,7 @@
   #include "feature/fanmux.h"
 #endif
 
-#if DO_SWITCH_EXTRUDER || ANY(SWITCHING_NOZZLE, PARKING_EXTRUDER, MAGNETIC_PARKING_EXTRUDER)
+#if DO_SWITCH_EXTRUDER || ANY(SWITCHING_NOZZLE, PARKING_EXTRUDER, MAGNETIC_PARKING_EXTRUDER, ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
   #include "module/tool_change.h"
 #endif
 
@@ -967,7 +967,7 @@ void setup() {
 
   // Load data from EEPROM if available (or use defaults)
   // This also updates variables in the planner, elsewhere
-  (void)settings.load();
+  settings.first_load();
 
   #if HAS_M206_COMMAND
     // Initialize current position based on home_offset
@@ -1102,6 +1102,10 @@ void setup() {
 
   #if ENABLED(PARKING_EXTRUDER)
     pe_solenoid_init();
+  #endif
+
+  #if ENABLED(ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
+    est_init();
   #endif
 
   #if ENABLED(POWER_LOSS_RECOVERY)
