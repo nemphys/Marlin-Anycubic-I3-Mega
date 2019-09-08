@@ -289,11 +289,11 @@ void DGUSScreenVariableHandler::DGUSLCD_SendStringToDisplayPGM(DGUS_VP_Variable 
 
     // Don't let the user in the dark why there is no reaction.
     if (!ExtUI::isMediaInserted()) {
-       setstatusmessagePGM(PSTR("No SD Card"));
+       setstatusmessagePGM(PSTR(MSG_NO_MEDIA));
        return;
     }
     if (card.flag.abort_sd_printing) {
-       setstatusmessagePGM(PSTR("Aborting..."));
+       setstatusmessagePGM(PSTR(MSG_MEDIA_ABORTING));
        return;
     }
   }
@@ -343,7 +343,7 @@ void DGUSScreenVariableHandler::DGUSLCD_SendStringToDisplayPGM(DGUS_VP_Variable 
   }
 
   void DGUSScreenVariableHandler::DGUSLCD_SD_StartPrint(DGUS_VP_Variable &var, void *val_ptr) {
-    if(!filelist.seek(file_to_print)) return;
+    if (!filelist.seek(file_to_print)) return;
     ExtUI::printFile(filelist.filename());
     ScreenHandler.GotoScreen(DGUSLCD_SCREEN_STATUS);
   }

@@ -216,7 +216,7 @@ float Planner::previous_speed[NUM_AXIS],
   float Planner::position_cart[XYZE];
 #endif
 
-#if ENABLED(ULTRA_LCD)
+#if HAS_SPI_LCD
   volatile uint32_t Planner::block_buffer_runtime_us = 0;
 #endif
 
@@ -1488,7 +1488,7 @@ void Planner::quick_stop() {
   // forced to empty, there's no risk the ISR will touch this.
   delay_before_delivering = BLOCK_DELAY_FOR_1ST_MOVE;
 
-  #if ENABLED(ULTRA_LCD)
+  #if HAS_SPI_LCD
     // Clear the accumulated runtime
     clear_block_buffer_runtime();
   #endif
@@ -2043,19 +2043,20 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
         // buffer is draining, add extra time.  The amount of time added increases if the buffer is still emptied more.
         const uint32_t nst = segment_time_us + LROUND(2 * (settings.min_segment_time_us - segment_time_us) / moves_queued);
         inverse_secs = 1000000.0f / nst;
-        #if defined(XY_FREQUENCY_LIMIT) || ENABLED(ULTRA_LCD)
+        #if defined(XY_FREQUENCY_LIMIT) || HAS_SPI_LCD
           segment_time_us = nst;
         #endif
       }
     }
   #endif
 
-  #if ENABLED(ULTRA_LCD)
+  #if HAS_SPI_LCD
     // Protect the access to the position.
     const bool was_enabled = STEPPER_ISR_ENABLED();
     if (was_enabled) DISABLE_STEPPER_DRIVER_INTERRUPT();
 
     block_buffer_runtime_us += segment_time_us;
+    block->segment_time_us = segment_time_us;
 
     if (was_enabled) ENABLE_STEPPER_DRIVER_INTERRUPT();
   #endif
@@ -2602,10 +2603,10 @@ bool Planner::buffer_segment(const float &a, const float &b, const float &c, con
   // The target position of the tool in absolute steps
   // Calculate target position in absolute steps
   const int32_t target[ABCE] = {
-    LROUND(a * settings.axis_steps_per_mm[A_AXIS]),
-    LROUND(b * settings.axis_steps_per_mm[B_AXIS]),
-    LROUND(c * settings.axis_steps_per_mm[C_AXIS]),
-    LROUND(e * settings.axis_steps_per_mm[E_AXIS_N(extruder)])
+    int32_t(LROUND(a * settings.axis_steps_per_mm[A_AXIS])),
+    int32_t(LROUND(b * settings.axis_steps_per_mm[B_AXIS])),
+    int32_t(LROUND(c * settings.axis_steps_per_mm[C_AXIS])),
+    int32_t(LROUND(e * settings.axis_steps_per_mm[E_AXIS_N(extruder)]))
   };
 
   #if HAS_POSITION_FLOAT
