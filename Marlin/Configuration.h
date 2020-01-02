@@ -476,9 +476,9 @@
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 
   // Anycubic I3 Mega
-  #define DEFAULT_Kp 14.39
-  #define DEFAULT_Ki 0.67
-  #define DEFAULT_Kd 77.24
+  #define DEFAULT_Kp 15.37
+  #define DEFAULT_Ki 0.63
+  #define DEFAULT_Kd 93.83
 
   // Ultimaker
   //#define DEFAULT_Kp 22.2
@@ -941,7 +941,7 @@
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define MIN_PROBE_EDGE 10
+#define MIN_PROBE_EDGE 25
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED 10000
