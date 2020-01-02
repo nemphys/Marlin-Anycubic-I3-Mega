@@ -32,7 +32,7 @@
 
 // Misc PINs
 #define BUZZER 			   31
-#define SDPOWER            -1
+#define SDPOWER_PIN        -1
 #define SDSS               53
 #define LED_PIN            13
 #define EXTRUDER_LED_PIN   12

@@ -89,6 +89,7 @@
 
 #if ENABLED(ANYCUBIC_TFT_MODEL)
   #include "../lcd/anycubic_TFT.h"
+#endif
 
 #if ENABLED(JOYSTICK)
   #include "../feature/joystick.h"

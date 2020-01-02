@@ -235,11 +235,11 @@ void AnycubicTFTClass::Ls()
         break;
     }
   }
-  else if(card.isDetected())
+  else if(card.isMounted())
   {
     uint16_t cnt=filenumber;
     uint16_t max_files;
-    uint16_t dir_files=card.getnrfilenames();
+    uint16_t dir_files=card.countFilesInWorkDir();
 
     if((dir_files-filenumber)<4)
     {
@@ -264,8 +264,8 @@ void AnycubicTFTClass::Ls()
           SERIAL_ECHOLNPGM("/..");
         }
       } else {
-        card.getfilename(cnt-1);
-//      card.getfilename(cnt);
+        card.selectFileByIndex(cnt-1);
+//      card.selectFileByIndex(cnt);
 
         if(card.flag.filenameIsDir) {
           ANYCUBIC_SERIAL_PROTOCOLPGM("/");
@@ -297,7 +297,7 @@ void AnycubicTFTClass::CheckSDCardChange()
 
     if (LastSDstatus)
     {
-      card.initsd();
+      card.mount();
       ANYCUBIC_SERIAL_PROTOCOLPGM("J00"); // J00 SD Card inserted
       ANYCUBIC_SERIAL_ENTER();
 #ifdef ANYCUBIC_TFT_DEBUG
@@ -536,7 +536,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
           case 6: //A6 GET SD CARD PRINTING STATUS
             if(card.flag.sdprinting){
               ANYCUBIC_SERIAL_PROTOCOLPGM("A6V ");
-              if(card.isDetected())
+              if(card.isMounted())
               {
                 ANYCUBIC_SERIAL_PROTOCOL(itostr3(card.percentDone()));
               }
@@ -617,7 +617,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
             }
             break;
           case 12: // A12 kill
-            kill(PSTR(MSG_KILLED));
+            kill(GET_TEXT(MSG_KILLED));
             break;
           case 13: // A13 SELECTION FILE
             if((!planner.movesplanned()) && (TFTstate!=ANYCUBIC_TFT_STATE_SDPAUSE) && (TFTstate!=ANYCUBIC_TFT_STATE_SDOUTAGE))
@@ -632,7 +632,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
 
                 if(starpos!=NULL)
                   *(starpos-1)='\0';
-                card.openFile(TFTstrchr_pointer + 4,true);
+                card.openFileRead(TFTstrchr_pointer + 4);
                 if (card.isFileOpen()) {
                   ANYCUBIC_SERIAL_PROTOCOLPGM("J20"); // J20 Open successful
                   ANYCUBIC_SERIAL_ENTER();
@@ -664,7 +664,7 @@ void AnycubicTFTClass::GetCommandFromTFT()
           case 15: // A15 RESUMING FROM OUTAGE
             //                    			if((!planner.movesplanned())&&(!TFTresumingflag))
             //                          {
-            //                                if(card.isDetected())
+            //                                if(card.isMounted())
             //                                FlagResumFromOutage=true;
             //                                ResumingFlag=1;
             //                                card.startFileprint();
@@ -827,15 +827,15 @@ void AnycubicTFTClass::GetCommandFromTFT()
             break;
           case 26: // A26 refresh SD
             if (SelectedDirectory[0]==0) {
-              card.initsd();
+              card.mount();
             } else {
               if ((SelectedDirectory[0] == '.') && (SelectedDirectory[1] == '.')) {
-                card.updir();
+                card.cdup();
               } else {
                 if (SelectedDirectory[0] == '<') {
                   HandleSpecialMenu();
                 } else {
-                  card.chdir(SelectedDirectory);
+                  card.cd(SelectedDirectory);
                 }
               }
             }
@@ -926,12 +926,12 @@ void AnycubicTFTClass::GetCommandFromTFT()
 
               if(CodeSeen('S')){
                 ANYCUBIC_SERIAL_PROTOCOLPGM("A9V ");
-                ANYCUBIC_SERIAL_PROTOCOL(itostr3(int(zprobe_zoffset*100.00 + 0.5)));
+                ANYCUBIC_SERIAL_PROTOCOL(itostr3(int(probe_offset.z*100.00 + 0.5)));
                 ANYCUBIC_SERIAL_ENTER();
 #ifdef ANYCUBIC_TFT_DEBUG
                 SERIAL_ECHOPGM("TFT sending current z-probe offset data... <");
                 SERIAL_ECHOPGM("A9V ");
-                SERIAL_ECHO(itostr3(int(zprobe_zoffset*100.00 + 0.5)));
+                SERIAL_ECHO(itostr3(int(probe_offset.z*100.00 + 0.5)));
                 SERIAL_ECHOLNPGM(">");
 #endif
               }
