@@ -41,7 +41,7 @@
   #include "../../lcd/anycubic_TFT.h"
 #endif
 
-#include "../../Marlin.h" // for wait_for_heatup, idle, startOrResumeJob
+#include "../../MarlinCore.h" // for wait_for_heatup, idle, startOrResumeJob
 
 /**
  * M140: Set bed temperature

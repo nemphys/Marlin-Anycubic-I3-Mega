@@ -170,6 +170,8 @@
   #include "ramps/pins_RAMPS_DAGOMA.h"          // ATmega2560                             env:megaatmega2560
 #elif MB(FYSETC_F6_13)
   #include "ramps/pins_FYSETC_F6_13.h"          // ATmega2560                             env:FYSETC_F6_13
+#elif MB(FYSETC_F6_14)
+  #include "ramps/pins_FYSETC_F6_14.h"          // ATmega2560                             env:FYSETC_F6_14
 #elif MB(DUPLICATOR_I3_PLUS)
   #include "ramps/pins_DUPLICATOR_I3_PLUS.h"    // ATmega2560                             env:megaatmega2560
 #elif MB(VORON)
@@ -184,7 +186,6 @@
   #include "ramps/pins_TANGO.h"                 // ATmega2560                             env:megaatmega2560
 #elif MB(MKS_GEN_L_V2)
   #include "ramps/pins_MKS_GEN_L_V2.h"          // ATmega2560                             env:megaatmega2560
-
 
 //
 // RAMBo and derivatives
@@ -247,6 +248,8 @@
   #include "mega/pins_OVERLORD.h"               // ATmega2560                             env:megaatmega2560
 #elif MB(HJC2560C_REV2)
   #include "mega/pins_HJC2560C_REV2.h"          // ATmega2560                             env:megaatmega2560
+#elif MB(LEAPFROG_XEED2015)
+  #include "mega/pins_LEAPFROG_XEED2015.h"      // ATmega2560                             env:megaatmega2560
 
 //
 // ATmega1281, ATmega2561
@@ -385,6 +388,8 @@
   #include "lpc1769/pins_SMOOTHIEBOARD.h"       // LPC1769                                env:LPC1769
 #elif MB(TH3D_EZBOARD)
   #include "lpc1769/pins_TH3D_EZBOARD.h"        // LPC1769                                env:LPC1769
+#elif MB(BIGTREE_SKR_V1_4_TURBO)
+  #include "lpc1769/pins_BTT_SKR_V1_4_TURBO.h"  // LPC1769                                env:LPC1769
 
 //
 // Due (ATSAM) boards
@@ -446,6 +451,8 @@
   #include "sam/pins_ADSK.h"                    // SAM3X8E                                env:DUE env:DUE_debug
 #elif MB(PRINTRBOARD_G2)
   #include "sam/pins_PRINTRBOARD_G2.h"          // SAM3X8C                                env:DUE_USB
+#elif MB(CNCONTROLS_15D)
+  #include "sam/pins_CNCONTROLS_15D.h"          // SAM3X8E                                env:DUE env:DUE_USB
 
 //
 // STM32 ARM Cortex-M3
@@ -1148,7 +1155,7 @@
 #endif
 
 // The Z2 axis, if any, should be the next open extruder port
-#if Z_MULTI_STEPPER_DRIVERS
+#if NUM_Z_STEPPER_DRIVERS >= 2
   #ifndef Z2_STEP_PIN
     #define Z2_STEP_PIN   _EPIN(Z2_E_INDEX, STEP)
     #define Z2_DIR_PIN    _EPIN(Z2_E_INDEX, DIR)
@@ -1195,7 +1202,7 @@
   #define Z2_MS3_PIN -1
 #endif
 
-#if ENABLED(Z_TRIPLE_STEPPER_DRIVERS)
+#if NUM_Z_STEPPER_DRIVERS >= 3
   #ifndef Z3_STEP_PIN
     #define Z3_STEP_PIN   _EPIN(Z3_E_INDEX, STEP)
     #define Z3_DIR_PIN    _EPIN(Z3_E_INDEX, DIR)
@@ -1226,6 +1233,7 @@
       #define Z3_SERIAL_RX_PIN _EPIN(Z3_E_INDEX, SERIAL_RX)
     #endif
   #endif
+  #define Z4_E_INDEX INCREMENT(Z3_E_INDEX)
 #endif
 
 #ifndef Z3_CS_PIN
@@ -1239,6 +1247,52 @@
 #endif
 #ifndef Z3_MS3_PIN
   #define Z3_MS3_PIN -1
+#endif
+
+#if NUM_Z_STEPPER_DRIVERS >= 4
+  #ifndef Z4_STEP_PIN
+    #define Z4_STEP_PIN   _EPIN(Z4_E_INDEX, STEP)
+    #define Z4_DIR_PIN    _EPIN(Z4_E_INDEX, DIR)
+    #define Z4_ENABLE_PIN _EPIN(Z4_E_INDEX, ENABLE)
+    #if Z4_E_INDEX >= MAX_EXTRUDERS || !PIN_EXISTS(Z4_STEP)
+      #error "No E stepper plug left for Z4!"
+    #endif
+  #endif
+  #if AXIS_HAS_SPI(Z4)
+    #ifndef Z4_CS_PIN
+      #define Z4_CS_PIN     _EPIN(Z4_E_INDEX, CS)
+    #endif
+  #endif
+  #ifndef Z4_MS1_PIN
+    #define Z4_MS1_PIN    _EPIN(Z4_E_INDEX, MS1)
+  #endif
+  #ifndef Z4_MS2_PIN
+    #define Z4_MS2_PIN    _EPIN(Z4_E_INDEX, MS2)
+  #endif
+  #ifndef Z4_MS3_PIN
+    #define Z4_MS3_PIN    _EPIN(Z4_E_INDEX, MS3)
+  #endif
+  #if AXIS_HAS_UART(Z4)
+    #ifndef Z4_SERIAL_TX_PIN
+      #define Z4_SERIAL_TX_PIN _EPIN(Z4_E_INDEX, SERIAL_TX)
+    #endif
+    #ifndef Z4_SERIAL_RX_PIN
+      #define Z4_SERIAL_RX_PIN _EPIN(Z4_E_INDEX, SERIAL_RX)
+    #endif
+  #endif
+#endif
+
+#ifndef Z4_CS_PIN
+  #define Z4_CS_PIN  -1
+#endif
+#ifndef Z4_MS1_PIN
+  #define Z4_MS1_PIN -1
+#endif
+#ifndef Z4_MS2_PIN
+  #define Z4_MS2_PIN -1
+#endif
+#ifndef Z4_MS3_PIN
+  #define Z4_MS3_PIN -1
 #endif
 
 #if HAS_GRAPHICAL_LCD
