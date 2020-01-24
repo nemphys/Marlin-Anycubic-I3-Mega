@@ -198,12 +198,6 @@ const char NUL_STR[] PROGMEM = "",
 
 bool Running = true;
 
-#if FAN_COUNT > 0
-  #if ENABLED(FAN_IS_SERVO)
-    uint8_t previous_fan_speed = -1;
-  #endif
-#endif
-
 // For M109 and M190, this flag may be cleared (by M108) to exit the wait loop
 bool wait_for_heatup = true;
 

@@ -1193,6 +1193,9 @@ void Planner::check_axes_activity() {
 
   #if FAN_COUNT > 0
     uint8_t tail_fan_speed[FAN_COUNT];
+    #if ENABLED(FAN_IS_SERVO)
+      uint8_t previous_fan_speed = -1;
+    #endif
   #endif
 
   #if ENABLED(BARICUDA)

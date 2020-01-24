@@ -25,7 +25,7 @@
 #include "Arduino.h"
 
 #include "../inc/MarlinConfig.h"
-#include "../Marlin.h"
+#include "../MarlinCore.h"
 #include "../sd/cardreader.h"
 #include "../module/planner.h"
 #include "../module/temperature.h"
