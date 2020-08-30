@@ -446,7 +446,7 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP 275
+#define HEATER_0_MAXTEMP 300
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
@@ -478,9 +478,9 @@
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 
   // Anycubic I3 Mega
-  #define DEFAULT_Kp 15.37
-  #define DEFAULT_Ki 0.63
-  #define DEFAULT_Kd 93.83
+  #define DEFAULT_Kp 32.75
+  #define DEFAULT_Ki 2.98
+  #define DEFAULT_Kd 89.86
 
   // Ultimaker
   //#define DEFAULT_Kp 22.2
