@@ -442,6 +442,10 @@ class Planner {
       volatile static uint32_t block_buffer_runtime_us; // Theoretical block buffer runtime in µs
     #endif
 
+    #if HAS_FAN && ENABLED(FAN0_IS_SERVO)
+      static uint8_t previous_fan0_speed; // Last applied servo fan speed value
+    #endif
+
   public:
 
     /**

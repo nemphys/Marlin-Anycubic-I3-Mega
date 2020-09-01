@@ -91,6 +91,10 @@
   #include "../feature/power.h"
 #endif
 
+#if HAS_FAN0 > 0 && ENABLED(FAN0_IS_SERVO)
+  #include "servo.h"
+#endif
+
 #if ENABLED(EXTERNAL_CLOSED_LOOP_CONTROLLER)
   #include "../feature/closedloop.h"
 #endif
@@ -236,6 +240,10 @@ float Planner::previous_nominal_speed_sqr;
 
 #if HAS_SPI_LCD
   volatile uint32_t Planner::block_buffer_runtime_us = 0;
+#endif
+
+#if HAS_FAN && ENABLED(FAN0_IS_SERVO)
+  uint8_t Planner::previous_fan0_speed = -1;
 #endif
 
 /**
@@ -1354,7 +1362,7 @@ void Planner::check_axes_activity() {
     #if FAN_KICKSTART_TIME > 0
       static millis_t fan_kick_end[FAN_COUNT] = { 0 };
       #define KICKSTART_FAN(f)                         \
-        if (tail_fan_speed[f]) {                       \
+        if ((f > 0 || DISABLED(FAN0_IS_SERVO)) && tail_fan_speed[f]) { \
           millis_t ms = millis();                      \
           if (fan_kick_end[f] == 0) {                  \
             fan_kick_end[f] = ms + FAN_KICKSTART_TIME; \
@@ -1377,7 +1385,13 @@ void Planner::check_axes_activity() {
     #elif ENABLED(FAST_PWM_FAN)
       #define _FAN_SET(F) set_pwm_duty(FAN##F##_PIN, CALC_FAN_SPEED(F));
     #else
-      #define _FAN_SET(F) analogWrite(pin_t(FAN##F##_PIN), CALC_FAN_SPEED(F));
+      #define _FAN_SET(F)                                                                                                                     \
+        if (F == 0 && ENABLED(FAN0_IS_SERVO)) {                                                                                               \
+          if (previous_fan0_speed != tail_fan_speed[F]) {											                                                                \
+            previous_fan0_speed = tail_fan_speed[F];											                                                                    \
+            MOVE_SERVO(FAN0_SERVO_NO, (tail_fan_speed[F] ? map(tail_fan_speed[F], 1, 255, FAN0_SERVO_MIN, FAN0_SERVO_MAX) : FAN0_SERVO_MIN)); \
+          }	                                                                                                                                  \
+        } else analogWrite(pin_t(FAN##F##_PIN), CALC_FAN_SPEED(F));
     #endif
     #define FAN_SET(F) do{ KICKSTART_FAN(F); _FAN_SET(F); }while(0)
 
