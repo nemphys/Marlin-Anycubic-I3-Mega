@@ -503,9 +503,9 @@
     //#define DEFAULT_Kd 114.00
 
     // Anycubic I3 Mega
-    #define DEFAULT_Kp 32.75
-    #define DEFAULT_Ki 2.98
-    #define DEFAULT_Kd 89.86
+    #define DEFAULT_Kp 29.91
+    #define DEFAULT_Ki 2.07
+    #define DEFAULT_Kd 107.81
   #endif
 #endif // PIDTEMP
 
