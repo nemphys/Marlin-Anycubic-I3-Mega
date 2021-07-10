@@ -609,9 +609,9 @@
     //#define DEFAULT_Kd 114.00
 
     // Anycubic I3 Mega
-    #define DEFAULT_Kp 29.91
-    #define DEFAULT_Ki 2.07
-    #define DEFAULT_Kd 107.81
+    #define DEFAULT_Kp 32.05
+    #define DEFAULT_Ki 2.20
+    #define DEFAULT_Kd 116.84
   #endif
 #endif // PIDTEMP
 
@@ -1004,7 +1004,7 @@
  *   https://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
  */
 #if DISABLED(CLASSIC_JERK)
-  #define JUNCTION_DEVIATION_MM 0.06 // (mm) Distance from real junction edge
+  #define JUNCTION_DEVIATION_MM 0.05 // (mm) Distance from real junction edge
   #define JD_HANDLE_SMALL_SEGMENTS    // Use curvature estimation instead of just the junction angle
                                       // for small segments (< 1mm) with large junction angles (> 135°).
 #endif
