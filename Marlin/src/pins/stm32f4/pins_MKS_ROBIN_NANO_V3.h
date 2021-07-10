@@ -172,8 +172,8 @@
 //
 // Thermocouples
 //
-//#define MAX6675_SS_PIN            HEATER_0_PIN  // TC1 - CS1
-//#define MAX6675_SS_PIN            HEATER_1_PIN  // TC2 - CS2
+//#define TEMP_0_CS_PIN             HEATER_0_PIN  // TC1 - CS1
+//#define TEMP_0_CS_PIN             HEATER_1_PIN  // TC2 - CS2
 
 //
 // Misc. Functions
@@ -190,7 +190,9 @@
   #define FIL_RUNOUT2_PIN               MT_DET_2
 #endif
 
-#define POWER_LOSS_PIN                    PW_DET
+#ifndef POWER_LOSS_PIN
+  #define POWER_LOSS_PIN                  PW_DET
+#endif
 #define PS_ON_PIN                         PW_OFF
 
 //
@@ -217,31 +219,25 @@
 //
 // detect pin dont work when ONBOARD and NO_SD_HOST_DRIVE disabled
 #if SD_CONNECTION_IS(ONBOARD)
-  #define CUSTOM_SPI_PINS                         // TODO: needed because is the only way to set SPI3 for SD on STM32 (by now)
-  #if ENABLED(CUSTOM_SPI_PINS)
-    #define ENABLE_SPI3
-    #define SD_SS_PIN                       -1
-    #define SDSS                            PC9
-    #define SD_SCK_PIN                      PC10
-    #define SD_MISO_PIN                     PC11
-    #define SD_MOSI_PIN                     PC12
-    #define SD_DETECT_PIN                   PD12
-  #endif
+  #define ENABLE_SPI3
+  #define SD_SS_PIN                         -1
+  #define SDSS                              PC9
+  #define SD_SCK_PIN                        PC10
+  #define SD_MISO_PIN                       PC11
+  #define SD_MOSI_PIN                       PC12
+  #define SD_DETECT_PIN                     PD12
 #endif
 
 //
 // LCD SD
 //
 #if SD_CONNECTION_IS(LCD)
-  #define CUSTOM_SPI_PINS
-  #if ENABLED(CUSTOM_SPI_PINS)
-    #define ENABLE_SPI1
-    #define SDSS                            PE10
-    #define SD_SCK_PIN                      PA5
-    #define SD_MISO_PIN                     PA6
-    #define SD_MOSI_PIN                     PA7
-    #define SD_DETECT_PIN                   PE12
-  #endif
+  #define ENABLE_SPI1
+  #define SDSS                              PE10
+  #define SD_SCK_PIN                        PA5
+  #define SD_MISO_PIN                       PA6
+  #define SD_MOSI_PIN                       PA7
+  #define SD_DETECT_PIN                     PE12
 #endif
 
 //
@@ -322,7 +318,8 @@
 
   #define TFT_BUFFER_SIZE                  14400
 
-#elif HAS_SPI_LCD
+#elif HAS_WIRED_LCD
+
   #define BEEPER_PIN                        PC5
   #define BTN_ENC                           PE13
   #define LCD_PINS_ENABLE                   PD13
@@ -344,6 +341,19 @@
     //#define MKS_LCD12864B
     //#undef SHOW_BOOTSCREEN
 
+  #elif ENABLED(MKS_MINI_12864_V3)
+    #define DOGLCD_CS                       PD13
+    #define DOGLCD_A0                       PC6
+    #define LCD_PINS_DC                DOGLCD_A0
+    #define LCD_BACKLIGHT_PIN               -1
+    #define LCD_RESET_PIN                   PE14
+    #define NEOPIXEL_PIN                    PE15
+    #define DOGLCD_MOSI                     PA7
+    #define DOGLCD_SCK                      PA5
+    #if SD_CONNECTION_IS(ONBOARD)
+      #define FORCE_SOFT_SPI
+    #endif
+
   #else // !MKS_MINI_12864
 
     #define LCD_PINS_D4                     PE14
@@ -358,4 +368,5 @@
     #define BOARD_ST7920_DELAY_3    DELAY_NS(600)
 
   #endif // !MKS_MINI_12864
-#endif // HAS_SPI_LCD
+
+#endif // HAS_WIRED_LCD

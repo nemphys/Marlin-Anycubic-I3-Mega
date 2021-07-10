@@ -36,7 +36,7 @@ void handle_status_leds() {
   static millis_t next_status_led_update_ms = 0;
   if (ELAPSED(millis(), next_status_led_update_ms)) {
     next_status_led_update_ms += 500; // Update every 0.5s
-    float max_temp = 0.0;
+    celsius_t max_temp = 0.0;
     HOTEND_LOOP()
       max_temp = thermalManager.degHotend(e);
     const int8_t new_red = (max_temp >= EXTRUDER_AUTO_FAN_TEMPERATURE) ? HIGH : (max_temp <  EXTRUDER_AUTO_FAN_TEMPERATURE) ? LOW : old_red;
